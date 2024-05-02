@@ -9,10 +9,11 @@ import {
   useLoaderData,
   json,
   Link,
+  NavLink,
 } from "@remix-run/react";
 
 import appStylesHref from "./app.css";
-import { getContacts } from "./data";
+import { getContacts } from "./data.server";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: appStylesHref },
@@ -23,7 +24,7 @@ export async function loader() {
   return json(contacts);
 }
 
-export default function App() {
+export default function Contact() {
   const contacts = useLoaderData<typeof loader>();
 
   return (
@@ -48,25 +49,30 @@ export default function App() {
               />
               <div id="search-spinner" aria-hidden hidden={true} />
             </Form>
-            <Form method="post">
-              <button type="submit">New</button>
-            </Form>
+            <Link className="button-link" to="contacts/create">
+              Create
+            </Link>
           </div>
           <nav>
             {contacts.length ? (
               <ul>
-                {contacts.map((contact) => (
+                {contacts.map((contact: any) => (
                   <li key={contact.id}>
-                    <Link to={`contacts/${contact.id}`}>
+                    <NavLink
+                      to={`contacts/${contact.id}`}
+                      className={({ isActive, isPending }) =>
+                        isActive ? "active" : isPending ? "pending" : ""
+                      }
+                    >
                       {contact.first || contact.last ? (
                         <>
                           {contact.first} {contact.last}
                         </>
                       ) : (
                         <i>No Name</i>
-                      )}{" "}
+                      )}
                       {contact.favorite ? <span>★</span> : null}
-                    </Link>
+                    </NavLink>
                   </li>
                 ))}
               </ul>
